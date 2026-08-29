@@ -1,5 +1,6 @@
-classom.example.todolistapp
+package com.example.todolistapp
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -11,17 +12,33 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.NightsStay
+import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
 import com.example.todolistapp.ui.theme.TodoListAppTheme
+import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
+// ---- Data model ----
+@Serializable
 data class TodoItem(val title: String, var isChecked: Boolean = false)
+
+// ---- DataStore setup ----
+val Context.dataStore by preferencesDataStore(name = "todo_prefs")
+val TODO_KEY = stringPreferencesKey("todo_list")
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,8 +67,34 @@ fun TodoAppScreen(
     isDarkTheme: Boolean,
     onThemeToggle: () -> Unit
 ) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
     var text by remember { mutableStateOf("") }
     val todoList = remember { mutableStateListOf<TodoItem>() }
+
+    // Load saved list once when the screen starts
+    LaunchedEffect(Unit) {
+        context.dataStore.data.collect { prefs ->
+            val json = prefs[TODO_KEY] ?: "[]"
+            val loaded = try {
+                Json.decodeFromString<List<TodoItem>>(json)
+            } catch (e: Exception) {
+                emptyList()
+            }
+            todoList.clear()
+            todoList.addAll(loaded)
+        }
+    }
+
+    // Saves the current list to disk
+    fun saveList() {
+        scope.launch {
+            context.dataStore.edit { prefs ->
+                prefs[TODO_KEY] = Json.encodeToString(todoList.toList())
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -60,7 +103,7 @@ fun TodoAppScreen(
                 actions = {
                     IconButton(onClick = onThemeToggle) {
                         Icon(
-                            imageVector = if (isDarkTheme) Icons.Default.Face else Icons.Default.Star,
+                            imageVector = if (isDarkTheme) Icons.Default.WbSunny else Icons.Default.NightsStay,
                             contentDescription = "Toggle theme"
                         )
                     }
@@ -97,6 +140,7 @@ fun TodoAppScreen(
                     onClick = {
                         if (text.isNotBlank()) {
                             todoList.add(TodoItem(text))
+                            saveList()
                             text = ""
                         }
                     },
@@ -138,6 +182,7 @@ fun TodoAppScreen(
                                 checked = item.isChecked,
                                 onCheckedChange = { checked ->
                                     todoList[index] = item.copy(isChecked = checked)
+                                    saveList()
                                 }
                             )
 
@@ -152,7 +197,10 @@ fun TodoAppScreen(
                             )
 
                             IconButton(
-                                onClick = { todoList.removeAt(index) }
+                                onClick = {
+                                    todoList.removeAt(index)
+                                    saveList()
+                                }
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Delete,
