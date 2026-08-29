@@ -1,4 +1,4 @@
-package com.example.todolistapp
+classom.example.todolistapp
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -27,12 +27,17 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            TodoListAppTheme {
+            var isDarkTheme by remember { mutableStateOf(false) }
+
+            TodoListAppTheme(darkTheme = isDarkTheme) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    TodoAppScreen()
+                    TodoAppScreen(
+                        isDarkTheme = isDarkTheme,
+                        onThemeToggle = { isDarkTheme = !isDarkTheme }
+                    )
                 }
             }
         }
@@ -41,7 +46,10 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TodoAppScreen() {
+fun TodoAppScreen(
+    isDarkTheme: Boolean,
+    onThemeToggle: () -> Unit
+) {
     var text by remember { mutableStateOf("") }
     val todoList = remember { mutableStateListOf<TodoItem>() }
 
@@ -49,6 +57,14 @@ fun TodoAppScreen() {
         topBar = {
             TopAppBar(
                 title = { Text("My Tasks", style = MaterialTheme.typography.titleLarge) },
+                actions = {
+                    IconButton(onClick = onThemeToggle) {
+                        Icon(
+                            imageVector = if (isDarkTheme) Icons.Default.Face else Icons.Default.Star,
+                            contentDescription = "Toggle theme"
+                        )
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
