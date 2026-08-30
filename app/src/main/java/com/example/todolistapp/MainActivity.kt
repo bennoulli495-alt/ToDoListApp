@@ -76,6 +76,16 @@ private fun AppNavHost(
                 onDeleteList = { list ->
                     lists.removeAll { it.id == list.id }
                     persist()
+                },
+                onToggleTask = { list, task ->
+                    val listIndex = lists.indexOfFirst { it.id == list.id }
+                    if (listIndex >= 0) {
+                        val updatedTasks = lists[listIndex].tasks.map {
+                            if (it.id == task.id) it.copy(isChecked = !it.isChecked) else it
+                        }.toMutableList()
+                        lists[listIndex] = lists[listIndex].copy(tasks = updatedTasks)
+                        persist()
+                    }
                 }
             )
         }
