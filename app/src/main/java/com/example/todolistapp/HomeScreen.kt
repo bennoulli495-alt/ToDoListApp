@@ -11,6 +11,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -21,7 +22,8 @@ fun HomeScreen(
     onThemeToggle: () -> Unit,
     onCreateList: () -> Unit,
     onEditList: (TodoList) -> Unit,
-    onDeleteList: (TodoList) -> Unit
+    onDeleteList: (TodoList) -> Unit,
+    onToggleTask: (TodoList, TodoTask) -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -29,10 +31,10 @@ fun HomeScreen(
                 title = { Text("Prime-List", style = MaterialTheme.typography.titleLarge) },
                 actions = {
                     IconButton(onClick = onThemeToggle) {
-    Text(
-        text = if (isDarkTheme) "☀️" else "🌙",
-        style = MaterialTheme.typography.titleLarge
-    )
+                        Text(
+                            text = if (isDarkTheme) "☀️" else "🌙",
+                            style = MaterialTheme.typography.titleLarge
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -72,7 +74,8 @@ fun HomeScreen(
                     ListCard(
                         list = list,
                         onEdit = { onEditList(list) },
-                        onDelete = { onDeleteList(list) }
+                        onDelete = { onDeleteList(list) },
+                        onToggleTask = { task -> onToggleTask(list, task) }
                     )
                 }
             }
@@ -84,7 +87,8 @@ fun HomeScreen(
 private fun ListCard(
     list: TodoList,
     onEdit: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    onToggleTask: (TodoTask) -> Unit
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
 
@@ -142,12 +146,25 @@ private fun ListCard(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             } else {
-                // Show up to 3 tasks as a quick preview
+                // Show up to 3 tasks as a quick preview, each with a checkbox
                 list.tasks.take(3).forEach { task ->
-                    Text(
-                        text = "• ${task.title}",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Checkbox(
+                            checked = task.isChecked,
+                            onCheckedChange = { onToggleTask(task) },
+                            modifier = Modifier.size(36.dp)
+                        )
+                        Text(
+                            text = task.title,
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                textDecoration = if (task.isChecked) TextDecoration.LineThrough else TextDecoration.None
+                            ),
+                            modifier = Modifier.padding(start = 4.dp)
+                        )
+                    }
                 }
                 if (list.tasks.size > 3) {
                     Text(
