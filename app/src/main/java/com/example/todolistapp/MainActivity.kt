@@ -23,7 +23,15 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            val context = LocalContext.current
+            val scope = rememberCoroutineScope()
             var isDarkTheme by remember { mutableStateOf(false) }
+
+            LaunchedEffect(Unit) {
+                TodoStorage.observeDarkTheme(context).collect { saved ->
+                    isDarkTheme = saved
+                }
+            }
 
             TodoListAppTheme(darkTheme = isDarkTheme) {
                 Surface(
@@ -32,7 +40,13 @@ class MainActivity : ComponentActivity() {
                 ) {
                     AppNavHost(
                         isDarkTheme = isDarkTheme,
-                        onThemeToggle = { isDarkTheme = !isDarkTheme }
+                        onThemeToggle = {
+                            val newValue = !isDarkTheme
+                            isDarkTheme = newValue
+                            scope.launch {
+                                TodoStorage.saveDarkTheme(context, newValue)
+                            }
+                        }
                     )
                 }
             }
