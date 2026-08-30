@@ -12,6 +12,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.NightsStay
+import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -100,10 +102,10 @@ fun TodoAppScreen(
                 title = { Text("My Tasks", style = MaterialTheme.typography.titleLarge) },
                 actions = {
                     IconButton(onClick = onThemeToggle) {
-    Text(
-        text = if (isDarkTheme) "☀️" else "🌙",
-        style = MaterialTheme.typography.titleLarge
-    )
+                        Icon(
+                            imageVector = if (isDarkTheme) Icons.Default.WbSunny else Icons.Default.NightsStay,
+                            contentDescription = "Toggle theme"
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
