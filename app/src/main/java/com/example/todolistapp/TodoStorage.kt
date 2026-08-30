@@ -1,6 +1,7 @@
 package com.example.todolistapp
 
 import android.content.Context
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -12,6 +13,7 @@ import kotlinx.serialization.json.Json
 
 val Context.dataStore by preferencesDataStore(name = "todo_prefs")
 private val TODO_LISTS_KEY = stringPreferencesKey("todo_lists")
+private val DARK_THEME_KEY = booleanPreferencesKey("dark_theme")
 
 object TodoStorage {
 
@@ -29,6 +31,18 @@ object TodoStorage {
     suspend fun saveLists(context: Context, lists: List<TodoList>) {
         context.dataStore.edit { prefs ->
             prefs[TODO_LISTS_KEY] = Json.encodeToString(lists)
+        }
+    }
+
+    fun observeDarkTheme(context: Context): Flow<Boolean> {
+        return context.dataStore.data.map { prefs ->
+            prefs[DARK_THEME_KEY] ?: false
+        }
+    }
+
+    suspend fun saveDarkTheme(context: Context, isDark: Boolean) {
+        context.dataStore.edit { prefs ->
+            prefs[DARK_THEME_KEY] = isDark
         }
     }
 }
