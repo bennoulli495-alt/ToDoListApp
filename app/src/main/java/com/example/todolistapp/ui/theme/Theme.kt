@@ -1,4 +1,4 @@
-package com.example.todolistapp.ui.theme
+LightColorSchemekColorSchemekage com.example.todolistapp.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -34,7 +34,7 @@ fun TodoListAppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(), // ဖုန်းမှာ Dark Mode ပွင့်နေရင် အလိုအလျောက် Dark Mode ပြောင်းပေးမည်
     content: @Composable () -> Unit
 ) {
-    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
+    val colorScheme = if (darkTheme) DarkColors else LightColors
 
     MaterialTheme(
         colorScheme = colorScheme,
