@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.example.todolistapp.ui.theme.TodoListAppTheme
 import kotlinx.coroutines.launch
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 
 // Which screen is currently shown.
 // Home = list of all TodoLists. Editor = create/edit a single TodoList.
@@ -21,6 +22,7 @@ private sealed class Screen {
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         setContent {
             val context = LocalContext.current
