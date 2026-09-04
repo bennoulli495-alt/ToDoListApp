@@ -65,22 +65,25 @@ fun HomeScreen(
                 )
             }
         } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(lists, key = { it.id }) { list ->
-                    ListCard(
-                        list = list,
-                        onEdit = { onEditList(list) },
-                        onDelete = { onDeleteList(list) },
-                        onToggleTask = { task -> onToggleTask(list, task) }
-                    )
-                }
+    Column(modifier = Modifier.padding(innerPadding)) {
+        CategoryCardDemoGrid()
+
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(lists, key = { it.id }) { list ->
+                ListCard(
+                    list = list,
+                    onEdit = { onEditList(list) },
+                    onDelete = { onDeleteList(list) },
+                    onToggleTask = { task -> onToggleTask(list, task) }
+                )
             }
+        }
+    }
         }
     }
 }
