@@ -8,8 +8,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.MenuBook
-import androidx.compose.material.icons.filled.Work
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -28,16 +26,16 @@ import androidx.compose.ui.unit.dp
 private data class CategoryPreview(
     val title: String,
     val taskCount: Int,
-    val icon: ImageVector,
+    val emoji: String,
     val backgroundColor: Color,
     val contentColor: Color
 )
 
 private val demoCategories = listOf(
-    CategoryPreview("Work", 2, Icons.Default.Work, Color(0xFF378ADD), Color(0xFF042C53)),
-    CategoryPreview("Study", 5, Icons.Default.MenuBook, Color(0xFF5DCAA5), Color(0xFF04342C)),
-    CategoryPreview("Personal", 3, Icons.Default.AccountCircle, Color(0xFFED93B1), Color(0xFF4B1528)),
-    CategoryPreview("General", 4, Icons.Default.List, Color(0xFFD3D1C7), Color(0xFF2C2C2A))
+    CategoryPreview("Work", 2, "💼", Color(0xFF378ADD), Color(0xFF042C53)),
+    CategoryPreview("Study", 5, "📖", Color(0xFF5DCAA5), Color(0xFF04342C)),
+    CategoryPreview("Personal", 3, "👤", Color(0xFFED93B1), Color(0xFF4B1528)),
+    CategoryPreview("General", 4, "📋", Color(0xFFD3D1C7), Color(0xFF2C2C2A))
 )
 
 @Composable
@@ -60,7 +58,7 @@ fun CategoryCardDemoGrid() {
                 CategoryCard(
                     title = category.title,
                     taskCount = category.taskCount,
-                    icon = category.icon,
+                    emoji = category.emoji,
                     backgroundColor = category.backgroundColor,
                     contentColor = category.contentColor
                 )
@@ -73,7 +71,7 @@ fun CategoryCardDemoGrid() {
 private fun CategoryCard(
     title: String,
     taskCount: Int,
-    icon: ImageVector,
+    emoji: String,
     backgroundColor: Color,
     contentColor: Color
 ) {
@@ -83,7 +81,7 @@ private fun CategoryCard(
         colors = CardDefaults.cardColors(containerColor = backgroundColor)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Icon(imageVector = icon, contentDescription = null, tint = contentColor)
+            Text(text = emoji, style = MaterialTheme.typography.titleLarge)
             Spacer(modifier = Modifier.height(20.dp))
             Text(
                 text = title,
