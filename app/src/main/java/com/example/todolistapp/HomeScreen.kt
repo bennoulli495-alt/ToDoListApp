@@ -13,6 +13,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.clickable
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,7 +59,7 @@ fun HomeScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    "List မရှိသေးပါ။ + ကိုနှိပ်ပြီး အသစ်ဖန်တီးပါ",
+                    "စာရင်းများမရှိသေးပါ။ + ကိုနှိပ်ပြီး အသစ်ဖန်တီးပါ",
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -91,6 +93,7 @@ private fun ListCard(
     onToggleTask: (TodoTask) -> Unit
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
+    var tasksExpanded by remember { mutableStateOf(false) }
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -100,7 +103,11 @@ private fun ListCard(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
         )
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(
+    modifier = Modifier
+        .padding(16.dp)
+        .animateContentSize()
+) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -141,38 +148,37 @@ private fun ListCard(
 
             if (list.tasks.isEmpty()) {
                 Text(
-                    "Task မရှိသေးပါ",
+                    "စာရင်းများမရှိသေးပါ",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             } else {
                 // Show up to 3 tasks as a quick preview, each with a checkbox
-                list.tasks.take(3).forEach { task ->
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Checkbox(
-                            checked = task.isChecked,
-                            onCheckedChange = { onToggleTask(task) },
-                            modifier = Modifier.size(36.dp)
-                        )
-                        Text(
-                            text = task.title,
-                            style = MaterialTheme.typography.bodyMedium.copy(
-                                textDecoration = if (task.isChecked) TextDecoration.LineThrough else TextDecoration.None
-                            ),
-                            modifier = Modifier.padding(start = 4.dp)
-                        )
-                    }
-                }
-                if (list.tasks.size > 3) {
-                    Text(
-                        text = "... နှင့် နောက်ထပ် ${list.tasks.size - 3} ခု",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
+                val visibleTasks = if (tasksExpanded) list.tasks else list.tasks.take(3)
+
+visibleTasks.forEach { task ->
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Checkbox(
+            checked = task.isChecked,
+            onCheckedChange = { onToggleTask(task) }
+        )
+        Text(
+            text = task.title,
+            style = MaterialTheme.typography.bodyMedium
+        )
+    }
+}
+
+if (list.tasks.size > 3) {
+    Text(
+        text = if (tasksExpanded) "အနည်းငယ်သာ ပြရန်" else "... နှင့် နောက်ထပ် ${list.tasks.size - 3} ခု",
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.primary,
+        modifier = Modifier
+            .clickable { tasksExpanded = !tasksExpanded }
+            .padding(top = 4.dp)
+    )
+}
             }
         }
     }
